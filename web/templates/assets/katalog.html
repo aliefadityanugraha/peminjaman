@@ -1,0 +1,87 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Katalog Aset Sekolah | AsetKita{% endblock %}
+
+{% block content %}
+<div class="row mb-5 align-items-center">
+    <div class="col-md-8">
+        <h1 class="fw-extrabold display-5 mb-2" style="letter-spacing: -1px; color: var(--text-primary);">
+            Katalog <span class="navbar-brand-gradient">Alat & Aset</span> Sekolah
+        </h1>
+        <p class="fs-5 mb-0" style="color: var(--text-secondary);">Temukan barang dan alat sekolah berkualitas yang siap Anda booking untuk kegiatan belajar mengajar secara instan.</p>
+    </div>
+    <div class="col-md-4 text-md-end mt-4 mt-md-0">
+        <a href="{% url 'booking' %}" class="btn btn-gradient-primary btn-lg shadow">
+            <i class="bi bi-plus-circle-fill me-2"></i> Booking Aset Baru
+        </a>
+    </div>
+</div>
+
+<!-- Kategori Filter Pill -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap gap-2 pb-2">
+            <a href="{% url 'katalog' %}" class="btn {% if not selected_category %}btn-gradient-primary{% else %}btn-outline-custom{% endif %} px-4 rounded-pill">
+                Semua Kategori
+            </a>
+            {% for category in categories %}
+                <a href="{% url 'katalog' %}?category={{ category|urlencode }}" class="btn {% if selected_category == category %}btn-gradient-primary{% else %}btn-outline-custom{% endif %} px-4 rounded-pill">
+                    {{ category }}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Katalog Grid -->
+<div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    {% for asset in assets %}
+        <div class="col">
+            <div class="card glass-card h-100 p-3 d-flex flex-column justify-content-between">
+                <div>
+                    <!-- Badge Kategori & Status -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="badge rounded-pill px-3 py-2 text-uppercase" style="font-size: 0.75rem; background: rgba(124, 58, 237, 0.1); color: var(--accent-purple); border: 1px solid rgba(124, 58, 237, 0.25);">
+                            {{ asset.category }}
+                        </span>
+                        <span class="badge rounded-pill px-3 py-2 text-uppercase status-badge-approved" style="font-size: 0.75rem;">
+                            <i class="bi bi-check-circle-fill me-1"></i> Ready
+                        </span>
+                    </div>
+
+                    <!-- Judul & Serial Number -->
+                    <h3 class="h4 fw-bold mb-1" style="color: var(--text-primary);">{{ asset.name }}</h3>
+                    <small class="d-block mb-3" style="color: var(--text-secondary);">
+                        <i class="bi bi-hash me-1"></i> Serial: <span class="font-monospace">{{ asset.serial_number }}</span>
+                    </small>
+
+                    <!-- Deskripsi Singkat -->
+                    <p class="mb-4" style="font-size: 0.95rem; line-height: 1.6; color: var(--text-secondary);">
+                        {{ asset.description|default:"Tidak ada deskripsi tambahan mengenai alat/aset sekolah ini." }}
+                    </p>
+                </div>
+
+                <!-- Tombol Action -->
+                <div class="pt-3 mt-auto" style="border-top: 1px solid var(--bg-light-300);">
+                    <a href="{% url 'booking' %}?asset_id={{ asset.id }}" class="btn btn-gradient-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-calendar-check-fill"></i> Booking Sekarang
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col-12 w-100">
+            <div class="card glass-card text-center p-5 d-flex flex-column align-items-center justify-content-center">
+                <div class="rounded-circle p-3 mb-3 d-inline-flex align-items-center justify-content-center" style="width: 80px; height: 80px; background-color: var(--bg-light-200);">
+                    <i class="bi bi-folder-x fs-1" style="color: var(--text-secondary);"></i>
+                </div>
+                <h3 class="fw-bold" style="color: var(--text-primary);">Aset Tidak Ditemukan</h3>
+                <p class="mb-4" style="color: var(--text-secondary);">Maaf, saat ini belum ada aset berstatus 'Available' yang sesuai dengan kategori yang dipilih.</p>
+                <a href="{% url 'katalog' %}" class="btn btn-outline-custom">
+                    <i class="bi bi-arrow-left me-2"></i> Reset Filter Kategori
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}

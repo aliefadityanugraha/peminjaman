@@ -1,0 +1,72 @@
+{% extends 'assets/base.html' %}
+
+{% block title %}Masuk | AsetKita Peminjam{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #ede9fe 0%, #fce7f3 50%, #e0f2fe 100%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="col-sm-10 col-md-8 col-lg-5">
+        <div class="card glass-card p-4 p-md-5 shadow-lg">
+            
+            <div class="text-center mb-4">
+                <div class="d-inline-flex align-items-center justify-content-center rounded-4 p-3 mb-3 shadow-sm" style="background: linear-gradient(135deg, rgba(124,58,237,0.1) 0%, rgba(219,39,119,0.1) 100%); border: 1px solid rgba(124,58,237,0.2);">
+                    <i class="bi bi-rocket-takeoff fs-1" style="color: var(--accent-purple);"></i>
+                </div>
+                <h2 class="fw-bold mb-1" style="color: var(--text-primary);">Selamat Datang</h2>
+                <p style="color: var(--text-secondary);">Masuk untuk membooking alat & melihat riwayat</p>
+            </div>
+
+            <form method="post" action="{% url 'login' %}" autocomplete="off">
+                {% csrf_token %}
+                
+                <!-- Input Username -->
+                <div class="mb-4">
+                    <label for="username" class="form-label fw-medium mb-2" style="color: var(--text-primary);">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0 rounded-start-3" style="background-color: var(--bg-light-200); border-color: var(--bg-light-300); color: var(--text-secondary);">
+                            <i class="bi bi-person-fill"></i>
+                        </span>
+                        <input type="text" name="username" id="username"
+                            class="form-control border-start-0 py-3 px-3 rounded-end-3"
+                            style="background-color: var(--bg-light-200); border-color: var(--bg-light-300); color: var(--text-primary);"
+                            placeholder="Masukkan username Anda..." required>
+                    </div>
+                </div>
+
+                <!-- Input Password -->
+                <div class="mb-4">
+                    <label for="password" class="form-label fw-medium mb-2" style="color: var(--text-primary);">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text border-end-0 rounded-start-3" style="background-color: var(--bg-light-200); border-color: var(--bg-light-300); color: var(--text-secondary);">
+                            <i class="bi bi-shield-lock-fill"></i>
+                        </span>
+                        <input type="password" name="password" id="password"
+                            class="form-control border-start-0 py-3 px-3 rounded-end-3"
+                            style="background-color: var(--bg-light-200); border-color: var(--bg-light-300); color: var(--text-primary);"
+                            placeholder="Masukkan password Anda..." required>
+                    </div>
+                </div>
+
+                <!-- Tombol Submit -->
+                <div class="d-grid mt-4">
+                    <button type="submit" class="btn btn-gradient-primary btn-lg w-100 py-3 rounded-3 text-uppercase fw-semibold">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Masuk Sekarang
+                    </button>
+                </div>
+            </form>
+
+            <div class="mt-4 pt-3 border-top text-center" style="color: var(--text-secondary);">
+                <small>Penggunaan Internal Sekolah.<br>Belum punya akun? Hubungi Admin Sekolah.</small>
+            </div>
+            
+        </div>
+    </div>
+</div>
+{% endblock %}

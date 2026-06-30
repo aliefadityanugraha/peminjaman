@@ -6,9 +6,9 @@ from PySide6.QtCore import Qt, Signal
 from PySide6.QtGui import QFont, QColor
 from PySide6.QtWidgets import QGraphicsDropShadowEffect
 
-class LayarLogin(QWidget):
-    permintaan_login = Signal(str, str)
-    permintaan_register = Signal()
+class LayarRegister(QWidget):
+    kembali_login = Signal()
+    permintaan_register = Signal(str, str, str, str, str)
 
     def __init__(self):
         super().__init__()
@@ -22,13 +22,13 @@ class LayarLogin(QWidget):
         return shadow
 
     def setup_ui(self):
-        self.setWindowTitle("PF Spaces - Masuk")
-        self.resize(420, 520)
+        self.setWindowTitle("PF Spaces - Daftar Akun")
+        self.resize(420, 680)
         main_layout = QVBoxLayout(self)
         main_layout.setAlignment(Qt.AlignCenter)
 
         card = QFrame()
-        card.setObjectName("loginCard")
+        card.setObjectName("registerCard")
         card.setFixedWidth(380)
         card_layout = QVBoxLayout(card)
         card_layout.setContentsMargins(36, 44, 36, 44)
@@ -40,7 +40,7 @@ class LayarLogin(QWidget):
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setStyleSheet("background: transparent; color: #1a1a2e;")
 
-        subtitle = QLabel("Masuk ke akun Anda")
+        subtitle = QLabel("Daftar Akun Baru")
         subtitle.setFont(QFont("Segoe UI", 12))
         subtitle.setAlignment(Qt.AlignCenter)
         subtitle.setStyleSheet("color: #6b7280; border: none; margin-bottom: 8px; background: transparent;")
@@ -48,39 +48,62 @@ class LayarLogin(QWidget):
         card_layout.addWidget(title_label)
         card_layout.addWidget(subtitle)
 
+        # Input Email 
+        self.email_input = QLineEdit()
+        self.email_input.setPlaceholderText("Email")
+        self.email_input.setMinimumHeight(44)
+        card_layout.addWidget(self.email_input)
+
+        # Input Nomor HP
+        self.no_hp_input = QLineEdit()
+        self.no_hp_input.setPlaceholderText("Nomor HP")
+        self.no_hp_input.setMinimumHeight(44)
+        card_layout.addWidget(self.no_hp_input)
+
+        # Input Username
         self.username_input = QLineEdit()
         self.username_input.setPlaceholderText("Username")
         self.username_input.setMinimumHeight(44)
         card_layout.addWidget(self.username_input)
 
+        # Input Password
         self.password_input = QLineEdit()
         self.password_input.setPlaceholderText("Password")
         self.password_input.setEchoMode(QLineEdit.Password)
         self.password_input.setMinimumHeight(44)
-        self.password_input.returnPressed.connect(self.handle_login_click)
+        self.password_input.returnPressed.connect(self.handle_register_click)
         card_layout.addWidget(self.password_input)
+
+        # Input Konfirmasi Password
+        self.konfirmasi_password_input = QLineEdit()
+        self.konfirmasi_password_input.setPlaceholderText("Konfirmasi Password")
+        self.konfirmasi_password_input.setEchoMode(QLineEdit.Password)
+        self.konfirmasi_password_input.setMinimumHeight(44)
+        self.konfirmasi_password_input.returnPressed.connect(self.handle_register_click)
+        card_layout.addWidget(self.konfirmasi_password_input)
 
         self.error_label = QLabel("")
         self.error_label.setVisible(False)
         self.error_label.setObjectName("errorLabel")
         card_layout.addWidget(self.error_label)
 
-        self.tombol_login = QPushButton("Masuk")
-        self.tombol_login.setObjectName("btnPrimary")
-        self.tombol_login.setMinimumHeight(46)
-        self.tombol_login.setCursor(Qt.PointingHandCursor)
-        self.tombol_login.clicked.connect(self.handle_login_click)
-        card_layout.addWidget(self.tombol_login)
-
-        # Registrasi
+        # Tombol Register
         self.tombol_register = QPushButton("Buat Akun")
-        self.tombol_register.setObjectName("btnSecondary")
+        self.tombol_register.setObjectName("btnPrimary")
         self.tombol_register.setMinimumHeight(46)
         self.tombol_register.setCursor(Qt.PointingHandCursor)
         self.tombol_register.clicked.connect(self.handle_register_click)
         card_layout.addWidget(self.tombol_register)
 
-        footer = QLabel("v1.0 — Pf Spaces")
+        # Tombol Login
+        self.tombol_login = QPushButton("Masuk Akun")
+        self.tombol_login.setObjectName("btnSecondary")
+        self.tombol_login.setMinimumHeight(46)
+        self.tombol_login.setCursor(Qt.PointingHandCursor)
+        self.tombol_login.clicked.connect(self.handle_login_click)
+        card_layout.addWidget(self.tombol_login)
+
+        footer = QLabel("v1.0 — PF Spaces")
         footer.setFont(QFont("Segoe UI", 9))
         footer.setAlignment(Qt.AlignCenter)
         footer.setStyleSheet("color: #9ca3af; border: none; margin-top: 4px; background: transparent;")
@@ -94,7 +117,7 @@ class LayarLogin(QWidget):
                     stop:0 #1a1a2e, stop:1 #16213e);
                 font-family: 'Segoe UI', 'Noto Sans', sans-serif;
             }
-            QFrame#loginCard {
+            QFrame#registerCard {
                 background: #ffffff;
                 border: none;
                 border-radius: 16px;
@@ -160,15 +183,22 @@ class LayarLogin(QWidget):
         """)
 
     def handle_login_click(self):
-        username = self.username_input.text().strip()
-        password = self.password_input.text()
-        if not username or not password:
-            self.show_error("Harap masukkan username dan password.")
-            return
-        self.permintaan_login.emit(username, password)
+        self.kembali_login.emit()
 
     def handle_register_click(self):
-        self.permintaan_register.emit()
+        email = self.email_input.text().strip()
+        no_hp = self.no_hp_input.text().strip()
+        username = self.username_input.text().strip()
+        password = self.password_input.text()
+        konfirmasi_password = self.konfirmasi_password_input.text()
+
+        if not username or not password or not email or not no_hp:
+            self.show_error("Harap masukkan semua data.")
+            return
+        if password != konfirmasi_password:
+            self.show_error("Password tidak cocok.")
+            return
+        self.permintaan_register.emit(email, no_hp, username, password, konfirmasi_password)
 
     def show_error(self, message):
         self.error_label.setText(message)

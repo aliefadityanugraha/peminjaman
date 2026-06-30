@@ -1,3 +1,4 @@
+from mysql.connector import cursor
 import sys
 
 # pyrefly: ignore [missing-import]
@@ -8,12 +9,20 @@ from views.login import LayarLogin
 from views.admin import DashboardAdmin
 from views.peminjam import DashboardPeminjam
 
+from views.register import LayarRegister
+
 class AppController:
     def __init__(self):
         self.login_screen = None
         self.main_window = None
+        self.register_screen = None
+
 
     def show_login_screen(self):
+        if self.register_screen:
+            self.register_screen.close()
+            self.register_screen = None
+
         if self.main_window:
             self.main_window.close()
             self.main_window = None
@@ -21,7 +30,11 @@ class AppController:
         self.login_screen = LayarLogin()
         # Connect the view's custom signal to the controller's login verification logic
         self.login_screen.permintaan_login.connect(self.handle_login)
+        
+        # Permintaan Tombol Register
+        self.login_screen.permintaan_register.connect(self.show_register_screen)
         self.login_screen.show()
+
 
     def handle_login(self, username, password):
         db = DatabaseConnection()
@@ -66,6 +79,53 @@ class AppController:
                 self.login_screen.show_error("Incorrect password.")
         except Exception as e:
             self.login_screen.show_error(f"Error during login: {e}")
+
+
+    def show_register_screen(self):
+        if self.login_screen:
+            self.login_screen.close()
+            self.login_screen = None
+        
+        self.register_screen = LayarRegister()
+        self.register_screen.kembali_login.connect(self.show_login_screen)
+        self.register_screen.permintaan_register.connect(self.handle_register)
+        self.register_screen.show()
+        
+
+    def handle_register(self, email, no_hp, username, password, konfirmasi_password):
+        
+        # Cek Kecocokan Password
+        if password != konfirmasi_password:
+            self.register_screen.show_error("Password tidak cocok.")
+            return
+
+        """Memproses data register dan menyimpannya ke database"""
+        db = DatabaseConnection()
+        conn = db.get_connection()
+        
+        if not conn:
+            print("Gagal terhubung ke database untuk register.")
+            return
+
+        try:
+            cursor = conn.cursor()
+            # Masukkan data ke tabel user (role default 'peminjam')
+            query = "INSERT INTO user (username, email, password, role, no_hp) VALUES (%s, %s, %s, 'peminjam', %s)"
+            cursor.execute(query, (username, email, password, no_hp))
+            conn.commit() 
+            cursor.close()
+
+            print("Registrasi berhasil! Silakan login...")
+            
+            # Setelah sukses mendaftar, otomatis kembali ke layar login
+            if self.register_screen:
+                self.register_screen.close()
+                self.register_screen = None
+            self.show_login_screen()
+        
+        except Exception as e:
+            self.register_screen.show_error(f"Gagal mendaftar: {e}")
+
 
     def show_main_window(self, user):
         """
